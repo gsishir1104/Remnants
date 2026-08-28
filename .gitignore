@@ -1,0 +1,28 @@
+# Python
+PythonServer/.venv/
+**/__pycache__/
+*.py[cod]
+.env
+.env.*
+
+# Editors and operating systems
+.vs/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Logs and local runtime output
+*.log
+logs/
+tmp/
+
+# Unity generated folders (if the full Unity project is copied here later)
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Bb]uild/
+[Bb]uilds/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+
