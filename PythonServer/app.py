@@ -362,6 +362,23 @@ Natural answer: I know your name is Chandru, but I don't really know you persona
 def is_relevant_citizen_question(clue_id, player_text):
     """Decide whether Chandru used his one question on the right subject."""
     lower = player_text.lower()
+
+    # A citizen owns one eyewitness memory about Chandru. Broad, natural
+    # questions about Chandru or the previous day must therefore invite that
+    # memory instead of failing merely because the player did not guess a
+    # designer-authored keyword. Prefixes also tolerate common typing errors
+    # such as "yesterdaay".
+    natural_investigation_questions = [
+        "who am i", "who was i", "know me", "recognize me", "remember me",
+        "about me", "seen me", "saw me", "last saw", "last time",
+        "yester", "before", "what did i", "what was i", "how was i",
+        "did i tell", "did i say", "did you see", "do you know",
+        "what happened", "happened to me", "where did i", "why am i",
+        "anything about", "something about", "what do you remember",
+    ]
+    if any(phrase in lower for phrase in natural_investigation_questions):
+        return True
+
     clue_keywords = {
         0: ["who am i", "who was i", "know me", "recognize me", "seen me", "remember me", "about me"],
         1: ["building", "office", "inside", "people entering", "closed place"],
@@ -380,7 +397,18 @@ def is_relevant_citizen_question(clue_id, player_text):
 def fixed_story_reply(player_text, data=None):
     """Answer critical premise questions without allowing model improvisation."""
     lower = player_text.lower().strip()
+    short_follow_up = lower.rstrip("?!., ")
     memories = ((data or {}).get("memories") or "").lower()
+
+    # Vague follow-ups are common in spoken conversation. They need a calm
+    # clarification from Varun, never an off-character question back at
+    # Chandru such as "Who are you?".
+    if short_follow_up in {"what", "what do you mean", "huh", "sorry", "explain"}:
+        return random.choice([
+            "I mean you used a nickname from when we were kids. I thought maybe hearing it would bring something back.",
+            "I mean, you said something that sounded exactly like the old you. It caught me off guard, that's all.",
+            "Sorry—I'm not trying to confuse you. I just thought for a second that you remembered something from before.",
+        ])
 
     asking_for_childhood_password = (
         "childhood phrase" in lower
@@ -588,6 +616,7 @@ def validate_varun_reply(reply, data):
         "journal", "haunted", "garden", "museum", "police station",
         "hospital", "go to the", "visit the", "perhaps ask", "try asking",
         "market square", "same as always",
+        "who are you?", "who are you ", "what is your name?",
     ]
 
     if any(phrase in lower for phrase in forbidden):
